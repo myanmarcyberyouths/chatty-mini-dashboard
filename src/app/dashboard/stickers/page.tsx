@@ -1,19 +1,29 @@
+'use client'
 import * as React from 'react';
-import type { Metadata } from 'next';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
-import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
+import { TextField , Box , Select , MenuItem , FormControl , InputLabel } from '@mui/material';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import dayjs from 'dayjs';
-
-import { config } from '@/config';
 import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
 import { CustomersTable } from '@/components/dashboard/customer/customers-table';
 import type { Customer } from '@/components/dashboard/customer/customers-table';
+import { styled } from '@mui/material/styles';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 
-export const metadata = { title: `Customers | Dashboard | ${config.site.name}` } satisfies Metadata;
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+});
 
 const customers = [
   {
@@ -112,36 +122,127 @@ const customers = [
 export default function Page(): React.JSX.Element {
   const page = 0;
   const rowsPerPage = 5;
+  const [file , setFile] = useState(null)
+  const [code , setCode] = useState('')
+  const [groupId , setGroupId] = useState('')
+  const [loading , setLoading] = useState(false)
 
   const paginatedCustomers = applyPagination(customers, page, rowsPerPage);
 
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  }
+
+  const handleUpload = async () => {
+    if (!file) {
+      alert("Please select a file before uploading.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("code", code);
+    formData.append("group_id", groupId);
+
+    try {
+      setLoading(true);
+      const response = await axios.post("http://localhost:8000/api/v1/sticker", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast('Successfully Uploaded', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Customers</Typography>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
-              Import
-            </Button>
-            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}>
-              Export
-            </Button>
-          </Stack>
-        </Stack>
-        <div>
-          <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained">
-            Add
-          </Button>
-        </div>
-      </Stack>
-      <CustomersFilters />
-      <CustomersTable
-        count={paginatedCustomers.length}
-        page={page}
-        rows={paginatedCustomers}
-        rowsPerPage={rowsPerPage}
-      />
+      <ToastContainer />
+      <Box
+        display="flex"
+        alignItems="flex-start"
+        justifyContent="flex-start"
+        sx={{
+          gap: 2,
+          maxWidth: '100%',
+          mx:'auto',
+          mt: 4,
+          p: 3,
+        }}
+      >
+        <FormControl fullWidth>
+          <TextField
+            label="Code"
+            name="code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            fullWidth
+          />
+        </FormControl>
+
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Group</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={groupId}
+            onChange={(e) => setGroupId(e.target.value)}
+            label="Group Name"
+          >
+            <MenuItem value={1}>Simple</MenuItem>
+            <MenuItem value={2}>Basic</MenuItem>
+            <MenuItem value={3}>General</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Button
+          component="label"
+          variant="contained"
+          tabIndex={-1}
+          startIcon={<UploadIcon />}
+          sx={{
+            width: '90px',
+            px: 6,
+            py: 2,
+          }}
+        >
+          Upload
+          <VisuallyHiddenInput
+            type="file"
+            onChange={handleFileChange}
+          />
+        </Button>
+
+        <Button
+          component="label"
+          variant="contained"
+          color='primary'
+          tabIndex={-1}
+          onClick={handleUpload}
+          sx={{
+            width: '90px',
+            px: 6,
+            py: 2,
+          }}
+        >
+          Submit
+        </Button>
+      </Box>
     </Stack>
   );
 }
