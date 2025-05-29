@@ -48,8 +48,15 @@ export function SideNav(): React.JSX.Element {
       }}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
-          <Logo color="light" height={32} width={122} />
+        <Box component={RouterLink} href={paths.dashboard.stickers} sx={{ display: 'inline-flex' }}
+        style={{
+          color: 'var(--mui-palette-common-white)',
+          textDecoration: 'none',
+          fontWeight: 'normal',
+          fontSize: '1.25rem',
+        }}
+        >
+           Sticker Dashboard
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
