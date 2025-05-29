@@ -1,17 +1,18 @@
 'use client'
 import * as React from 'react';
-import { useState } from 'react';
+import {useState} from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import { TextField , Box , Select , MenuItem , FormControl , InputLabel } from '@mui/material';
-import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
+import {TextField, Box, Select, MenuItem, FormControl, InputLabel} from '@mui/material';
+import {Upload as UploadIcon} from '@phosphor-icons/react/dist/ssr/Upload';
 import dayjs from 'dayjs';
-import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
-import { CustomersTable } from '@/components/dashboard/customer/customers-table';
-import type { Customer } from '@/components/dashboard/customer/customers-table';
-import { styled } from '@mui/material/styles';
+import {CustomersFilters} from '@/components/dashboard/customer/customers-filters';
+import {CustomersTable} from '@/components/dashboard/customer/customers-table';
+import type {Customer} from '@/components/dashboard/customer/customers-table';
+import {styled} from '@mui/material/styles';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import {ToastContainer, toast} from 'react-toastify';
+import {createNextApiEsmAliases} from "next/dist/build/create-compiler-aliases";
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -32,7 +33,7 @@ const customers = [
     avatar: '/assets/avatar-10.png',
     email: 'alcides.antonio@devias.io',
     phone: '908-691-3242',
-    address: { city: 'Madrid', country: 'Spain', state: 'Comunidad de Madrid', street: '4158 Hedge Street' },
+    address: {city: 'Madrid', country: 'Spain', state: 'Comunidad de Madrid', street: '4158 Hedge Street'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
   {
@@ -41,7 +42,7 @@ const customers = [
     avatar: '/assets/avatar-9.png',
     email: 'marcus.finn@devias.io',
     phone: '415-907-2647',
-    address: { city: 'Carson City', country: 'USA', state: 'Nevada', street: '2188 Armbrester Drive' },
+    address: {city: 'Carson City', country: 'USA', state: 'Nevada', street: '2188 Armbrester Drive'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
   {
@@ -50,7 +51,7 @@ const customers = [
     avatar: '/assets/avatar-8.png',
     email: 'jie.yan.song@devias.io',
     phone: '770-635-2682',
-    address: { city: 'North Canton', country: 'USA', state: 'Ohio', street: '4894 Lakeland Park Drive' },
+    address: {city: 'North Canton', country: 'USA', state: 'Ohio', street: '4894 Lakeland Park Drive'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
   {
@@ -59,7 +60,7 @@ const customers = [
     avatar: '/assets/avatar-7.png',
     email: 'nasimiyu.danai@devias.io',
     phone: '801-301-7894',
-    address: { city: 'Salt Lake City', country: 'USA', state: 'Utah', street: '368 Lamberts Branch Road' },
+    address: {city: 'Salt Lake City', country: 'USA', state: 'Utah', street: '368 Lamberts Branch Road'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
   {
@@ -68,7 +69,7 @@ const customers = [
     avatar: '/assets/avatar-6.png',
     email: 'iulia.albu@devias.io',
     phone: '313-812-8947',
-    address: { city: 'Murray', country: 'USA', state: 'Utah', street: '3934 Wildrose Lane' },
+    address: {city: 'Murray', country: 'USA', state: 'Utah', street: '3934 Wildrose Lane'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
   {
@@ -77,7 +78,7 @@ const customers = [
     avatar: '/assets/avatar-5.png',
     email: 'fran.perez@devias.io',
     phone: '712-351-5711',
-    address: { city: 'Atlanta', country: 'USA', state: 'Georgia', street: '1865 Pleasant Hill Road' },
+    address: {city: 'Atlanta', country: 'USA', state: 'Georgia', street: '1865 Pleasant Hill Road'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
 
@@ -87,7 +88,7 @@ const customers = [
     avatar: '/assets/avatar-4.png',
     email: 'penjani.inyene@devias.io',
     phone: '858-602-3409',
-    address: { city: 'Berkeley', country: 'USA', state: 'California', street: '317 Angus Road' },
+    address: {city: 'Berkeley', country: 'USA', state: 'California', street: '317 Angus Road'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
   {
@@ -96,7 +97,7 @@ const customers = [
     avatar: '/assets/avatar-3.png',
     email: 'carson.darrin@devias.io',
     phone: '304-428-3097',
-    address: { city: 'Cleveland', country: 'USA', state: 'Ohio', street: '2849 Fulton Street' },
+    address: {city: 'Cleveland', country: 'USA', state: 'Ohio', street: '2849 Fulton Street'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
   {
@@ -105,7 +106,7 @@ const customers = [
     avatar: '/assets/avatar-2.png',
     email: 'siegbert.gottfried@devias.io',
     phone: '702-661-1654',
-    address: { city: 'Los Angeles', country: 'USA', state: 'California', street: '1798 Hickory Ridge Drive' },
+    address: {city: 'Los Angeles', country: 'USA', state: 'California', street: '1798 Hickory Ridge Drive'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
   {
@@ -114,22 +115,25 @@ const customers = [
     avatar: '/assets/avatar-1.png',
     email: 'miron.vitold@devias.io',
     phone: '972-333-4106',
-    address: { city: 'San Diego', country: 'USA', state: 'California', street: '75247' },
+    address: {city: 'San Diego', country: 'USA', state: 'California', street: '75247'},
     createdAt: dayjs().subtract(2, 'hours').toDate(),
   },
 ] satisfies Customer[];
 
+
+const apiURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function Page(): React.JSX.Element {
   const page = 0;
   const rowsPerPage = 5;
-  const [file , setFile] = useState(null)
-  const [code , setCode] = useState('')
-  const [groupId , setGroupId] = useState('')
-  const [loading , setLoading] = useState(false)
+  const [file, setFile] = useState(null)
+  const [code, setCode] = useState('')
+  const [groupId, setGroupId] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const paginatedCustomers = applyPagination(customers, page, rowsPerPage);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: any) => {
     setFile(event.target.files[0]);
   }
 
@@ -146,7 +150,7 @@ export default function Page(): React.JSX.Element {
 
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:8000/api/v1/sticker", formData, {
+      const response = await axios.post(apiURL + "/sticker", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -172,7 +176,7 @@ export default function Page(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
-      <ToastContainer />
+      <ToastContainer/>
       <Box
         display="flex"
         alignItems="flex-start"
@@ -180,7 +184,7 @@ export default function Page(): React.JSX.Element {
         sx={{
           gap: 2,
           maxWidth: '100%',
-          mx:'auto',
+          mx: 'auto',
           mt: 4,
           p: 3,
         }}
@@ -214,7 +218,7 @@ export default function Page(): React.JSX.Element {
           component="label"
           variant="contained"
           tabIndex={-1}
-          startIcon={<UploadIcon />}
+          startIcon={<UploadIcon/>}
           sx={{
             width: '90px',
             px: 6,
